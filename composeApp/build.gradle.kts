@@ -64,6 +64,8 @@ kotlin {
             implementation(libs.coil.svg)
             implementation(libs.coil.network.ktor)
 
+            implementation(libs.shimmer)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

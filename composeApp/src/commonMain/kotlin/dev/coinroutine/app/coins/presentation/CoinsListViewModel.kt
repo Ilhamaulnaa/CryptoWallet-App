@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class CoinsListViewModel (
     private val getCoinsListUseCase: GetCoinsListUseCase,
+    private val getCoinsHistoryUseCase: GetCoinsHistoryUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CoinsState())
@@ -31,10 +32,17 @@ class CoinsListViewModel (
         )
 
     private suspend fun getAllCoin(){
-        when(val responseCoin = getCoinsListUseCase.execute()){
-            is Result.Success -> {
-                _state.update {
-                    CoinsState(
+
+        _state.update { it.copy(isLoading = true) }
+
+        val responseCoin = getCoinsListUseCase.execute()
+
+        _state.update { currentState ->
+            when(responseCoin) {
+                is Result.Success -> {
+                    currentState.copy(
+                        isLoading = false,
+                        error = null,
                         coins = responseCoin.data.map { modelCoin ->
                             UiCoinListItem(
                                 id = modelCoin.coin.id,
@@ -48,15 +56,61 @@ class CoinsListViewModel (
                         }
                     )
                 }
-            }
-            is Result.Error -> {
-                _state.update {
-                    it.copy(
-                        coins = emptyList(),
+                is Result.Error -> {
+                    currentState.copy(
+                        isLoading = false,
                         error = responseCoin.error.toUiText()
                     )
                 }
             }
+        }
+
+    }
+
+    fun onCoinLongPressed(coinId: String){
+
+        _state.update {
+            it.copy(
+                chartState = UiChartState(
+                    sparkLine = emptyList(),
+                    isLoading = true
+                )
+            )
+        }
+
+        viewModelScope.launch {
+            when(val responsePrice = getCoinsHistoryUseCase.execute(coinId)){
+                is Result.Success -> {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            chartState = UiChartState(
+                                sparkLine = responsePrice.data.sortedBy { it.timestamp }.map { it.price },
+                                isLoading = false,
+                                coinName = _state.value.coins.find { it.id == coinId }?.name.orEmpty(),
+                            )
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    _state.update {
+                        it.copy(
+                            chartState = UiChartState(
+                                sparkLine = emptyList(),
+                                isLoading = false,
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+    }
+
+    fun onDismissChart(){
+        _state.update {
+            it.copy(
+                chartState = null
+            )
         }
     }
 

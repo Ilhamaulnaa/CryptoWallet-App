@@ -29,6 +29,7 @@ biometry = "1.1.0"
 assertK = "0.25"
 turbine = "0.7.0"
 core-ktx = "1.7.0"
+shimmer = "1.2.0"
 
 [libraries]
 #kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -85,6 +86,11 @@ coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil-compose" 
 
 # Biometry Libraries
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometry" }
+
+# Shimmer
+shimmer = { group="com.valentinilk.shimmer", name="compose-shimmer", version.ref="shimmer" }
+#implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
