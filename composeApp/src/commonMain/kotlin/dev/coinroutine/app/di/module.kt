@@ -1,11 +1,15 @@
 package dev.coinroutine.app.di
 
+import androidx.room.RoomDatabase
 import dev.coinroutine.app.coins.data.remote.impl.KtorCoinsRemoteDataSource
 import dev.coinroutine.app.coins.domain.GetCoinDetailsUseCase
 import dev.coinroutine.app.coins.domain.GetCoinsHistoryUseCase
 import dev.coinroutine.app.coins.domain.GetCoinsListUseCase
 import dev.coinroutine.app.coins.domain.api.CoinsRemoteDataSource
 import dev.coinroutine.app.coins.presentation.CoinsListViewModel
+import dev.coinroutine.app.core.database.portfolio.PortfolioDatabase
+import dev.coinroutine.app.core.database.portfolio.PortfolioDatabaseCreator
+import dev.coinroutine.app.core.database.portfolio.getPortfolioDatabase
 import dev.coinroutine.app.core.network.HttpClientFactory
 import io.ktor.client.HttpClient
 import org.koin.compose.viewmodel.dsl.viewModel
@@ -36,6 +40,11 @@ val sharedPlatform = module {
 
     //core (Networking)
     single<HttpClient>{ HttpClientFactory.create(get()) }
+
+    //portfolio
+    single {
+        getPortfolioDatabase(get<RoomDatabase.Builder<PortfolioDatabase>>())
+    }
 
     //coin list
     viewModel { CoinsListViewModel(get(), get()) }

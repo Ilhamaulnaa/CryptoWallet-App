@@ -1,8 +1,5 @@
 package dev.coinroutine.app.coins.presentation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -37,6 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -254,12 +255,19 @@ fun CoinChartDialog(
     onDismissClick: () -> Unit
 ){
 
+    val titleDialog = buildAnnotatedString {
+        append("24h price chart for ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)){
+            append(uiChartState.coinName)
+        }
+    }
+
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissClick,
         title = {
             Text(
-                text = "24h price chart for ${uiChartState.coinName}"
+                text = titleDialog
             )
         },
         text = {
@@ -291,6 +299,23 @@ fun CoinChartDialog(
         }
     )
 
+}
+
+@Preview
+@Composable
+fun PreviewCoinChartDialog(){
+    CoinRoutineTheme {
+        Surface {
+            val uiCharState = UiChartState(
+                isLoading = false,
+                coinName = "Etherume"
+            )
+            CoinChartDialog(
+                uiChartState = uiCharState,
+                onDismissClick = {}
+            )
+        }
+    }
 }
 
 @Composable
